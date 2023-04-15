@@ -1,24 +1,24 @@
 import pkg from '@apollo/client';
 const { ApolloClient, InMemoryCache, gql } = pkg;
 
-export const getVM = async (uri) => {
+export const serverDetails = async (uri) => {
     const client = new ApolloClient({
         uri: uri,
         cache: new InMemoryCache()
     });
 
-    const GET_VM = gql`query Query {
-        vms {
+    const GET_SERVER = gql`query Query {
+        server_details {
           server_id
-          vmMips
-          vmName
-          vm_id
+          server_name
+          total_mips
+          unit_power_cost
         }
       }`
 
     try {
         const result = await client.query({
-            query: GET_VM
+            query: GET_SERVER
         });
         return result;
     } catch (error) {
@@ -27,4 +27,5 @@ export const getVM = async (uri) => {
 
 }
 
+// console.log(await serverDetails('http://localhost:4000'))
 
