@@ -10,6 +10,15 @@ export const vmDetails = async (uri) => {
     const GET_VM = gql`query Query {
         vms {
           server_id
+          task {
+            server_id
+            task_id
+            taskLength
+            taskDeadline
+            communicationCost
+            taskName
+            vm_id
+          }
           vmMips
           vmName
           vm_id
