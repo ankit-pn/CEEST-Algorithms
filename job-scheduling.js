@@ -3,8 +3,8 @@ import { populateVMWeights } from './vm-resources.js';
 import servers from './servers.json' assert {type: 'json'}
 import task from './task.json' assert {type: 'json'}
 import { serverDetails } from './server-details.js';
-
-const findOptimalVm = async (task, servers) => {
+import { findRemainingResources, findWeight } from './server-resources.js';
+export const findOptimalVm = async (task, servers) => {
 
     try {
         let task_length = task['taskLength'];
@@ -45,6 +45,40 @@ const findOptimalVm = async (task, servers) => {
     }
 }
 
-console.log(await findOptimalVm(task,servers));
+// console.log(await findOptimalVm(task, servers));
 
-// export s
+export const scaleVm = async (servers) => {
+    try {
+        const Servers = servers.servers;
+        let res = { vm_id: null };
+        for (let server of Servers) {
+            let vms = await populateVMWeights(server);
+            let remainingResources = await findRemainingResources(server);
+
+            for (let vm of vms['vms']) {
+                if (!res['vm_id']) {
+                    res = vm;
+                }
+                else {
+                    if (vm['weight'] > res['weight']) {
+                        res = vm;
+                    }
+                }
+            }
+            if (res['vm_id']) {
+                res['weight'] = res['weight'] + remainingResources;
+            }
+        }
+        if (res['vm_id']) {
+            return res;
+        }
+        else {
+            return { msg: "No optimal virtual machine can be scaled in this server " };
+        }
+    }
+    catch (error) {
+        return error;
+    }
+}
+// console.log(await populateVMWeights(servers['servers'][0]));
+// console.log(await scaleVm(servers));
